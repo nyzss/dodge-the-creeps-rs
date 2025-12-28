@@ -50,15 +50,31 @@ impl IArea2D for Player {
             direction += Vector2::LEFT;
         }
 
-        let movement = direction * self.speed as f32 * delta as f32;
+        let velocity = direction * self.speed as f32 * delta as f32;
 
-        if movement.length() > 0. {
-            self.animated_sprite.set_animation("up");
+        if velocity.length() > 0. {
+            let animation: &str;
+
+            if velocity.x != 0. {
+                animation = "walk";
+
+                self.animated_sprite.set_flip_v(false);
+                self.animated_sprite.set_flip_h(velocity.x < 0.);
+            } else {
+                animation = "up";
+
+                self.animated_sprite.set_flip_v(velocity.y > 0.);
+            }
+
+            self.animated_sprite.play_ex().name(animation).done();
         } else {
-            self.animated_sprite.set_animation("walk");
+            self.animated_sprite.stop();
         }
-        self.animated_sprite.play();
 
-        self.base_mut().translate(movement);
+        let position = self.base().get_global_position();
+
+        let new_position = (position + velocity).clamp(Vector2::ZERO, self.screen_size);
+
+        self.base_mut().set_global_position(new_position);
     }
 }
