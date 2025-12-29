@@ -24,7 +24,6 @@ impl IRigidBody2D for Mob {
     }
 
     fn ready(&mut self) {
-        godot_print!("hello world from enemy");
         let mut animated_sprites = self
             .base()
             .get_node_as::<AnimatedSprite2D>("AnimatedSprite2D");

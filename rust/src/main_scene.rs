@@ -33,12 +33,10 @@ impl Main {
 
     #[func]
     fn new_game(&mut self) {
-        self.score = 0;
-
         let start_position = self.base().get_node_as::<Marker2D>("StartPosition");
-
         let mut player = self.base().get_node_as::<player::Player>("Player");
 
+        self.score = 0;
         player.bind_mut().start(start_position.get_position());
         self.start_timer.start();
     }
@@ -92,12 +90,19 @@ impl INode for Main {
     }
 
     fn ready(&mut self) {
+        let main = self.to_gd();
+
         self.mob_timer
             .init(self.base().get_node_as::<Timer>("MobTimer"));
         self.score_timer
             .init(self.base().get_node_as::<Timer>("ScoreTimer"));
         self.start_timer
             .init(self.base().get_node_as::<Timer>("StartTimer"));
+
+        self.mob_timer
+            .signals()
+            .timeout()
+            .connect_other(&main, Self::on_mob_timer_timeout);
 
         self.new_game();
     }
