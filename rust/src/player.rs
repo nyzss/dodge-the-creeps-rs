@@ -3,7 +3,7 @@ use godot::prelude::*;
 
 #[derive(GodotClass)]
 #[class(base=Area2D)]
-struct Player {
+pub struct Player {
     base: Base<Area2D>,
 
     #[export]
@@ -30,7 +30,7 @@ impl Player {
     }
 
     #[func]
-    fn start(&mut self, pos: Vector2) {
+    pub fn start(&mut self, pos: Vector2) {
         self.base_mut().set_position(pos);
 
         self.base_mut().show();
