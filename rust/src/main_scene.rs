@@ -17,30 +17,30 @@ struct Main {
     #[export]
     mob_scene: OnEditor<Gd<PackedScene>>,
     score: u32,
+
+    mob_timer: OnReady<Gd<Timer>>,
+    score_timer: OnReady<Gd<Timer>>,
+    start_timer: OnReady<Gd<Timer>>,
 }
 
 #[godot_api]
 impl Main {
     #[func]
     fn game_over(&mut self) {
-        let mut score_timer = self.base().get_node_as::<Timer>("ScoreTimer");
-        let mut mob_timer = self.base().get_node_as::<Timer>("MobTimer");
-
-        score_timer.stop();
-        mob_timer.stop();
+        self.score_timer.stop();
+        self.mob_timer.stop();
     }
 
     #[func]
     fn new_game(&mut self) {
         self.score = 0;
 
-        let mut start_timer = self.base().get_node_as::<Timer>("StartTimer");
         let start_position = self.base().get_node_as::<Marker2D>("StartPosition");
 
         let mut player = self.base().get_node_as::<player::Player>("Player");
 
         player.bind_mut().start(start_position.get_position());
-        start_timer.start();
+        self.start_timer.start();
     }
 
     #[func]
@@ -50,11 +50,8 @@ impl Main {
 
     #[func]
     fn on_start_timer_timeout(&mut self) {
-        let mut mob_timer = self.base().get_node_as::<Timer>("MobTimer");
-        let mut score_timer = self.base().get_node_as::<Timer>("ScoreTimer");
-
-        mob_timer.start();
-        score_timer.start();
+        self.mob_timer.start();
+        self.score_timer.start();
     }
 
     #[func]
@@ -87,10 +84,21 @@ impl INode for Main {
             base,
             score: 0,
             mob_scene: OnEditor::default(),
+
+            mob_timer: OnReady::manual(),
+            score_timer: OnReady::manual(),
+            start_timer: OnReady::manual(),
         }
     }
 
     fn ready(&mut self) {
+        self.mob_timer
+            .init(self.base().get_node_as::<Timer>("MobTimer"));
+        self.score_timer
+            .init(self.base().get_node_as::<Timer>("ScoreTimer"));
+        self.start_timer
+            .init(self.base().get_node_as::<Timer>("StartTimer"));
+
         self.new_game();
     }
 }
