@@ -5,17 +5,26 @@ use godot::{
 
 #[derive(GodotClass)]
 #[class(base=RigidBody2D)]
-struct Enemy {
+struct Mob {
     base: Base<RigidBody2D>,
 }
 
 #[godot_api]
-impl IRigidBody2D for Enemy {
+impl Mob {
+    #[func]
+    fn on_screen_exited(&mut self) {
+        self.base_mut().queue_free();
+    }
+}
+
+#[godot_api]
+impl IRigidBody2D for Mob {
     fn init(base: Base<RigidBody2D>) -> Self {
-        Enemy { base }
+        Mob { base }
     }
 
     fn ready(&mut self) {
+        godot_print!("hello world from enemy");
         let mut animated_sprites = self
             .base()
             .get_node_as::<AnimatedSprite2D>("AnimatedSprite2D");
