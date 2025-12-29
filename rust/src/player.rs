@@ -1,15 +1,45 @@
-use godot::classes::{AnimatedSprite2D, Area2D, IArea2D, Input};
+use godot::classes::{AnimatedSprite2D, Area2D, CollisionShape2D, IArea2D, Input};
 use godot::prelude::*;
 
 #[derive(GodotClass)]
 #[class(base=Area2D)]
 struct Player {
+    base: Base<Area2D>,
+
     #[export]
     speed: i32,
     screen_size: Vector2,
     animated_sprite: OnReady<Gd<AnimatedSprite2D>>,
+}
 
-    base: Base<Area2D>,
+#[godot_api]
+impl Player {
+    #[signal]
+    fn hit();
+
+    #[func]
+    fn on_body_entered(&mut self, _body: Gd<Node2D>) {
+        self.base_mut().hide();
+
+        self.signals().hit().emit();
+
+        let mut collision_shape = self
+            .base()
+            .get_node_as::<CollisionShape2D>("CollisionShape2D");
+        collision_shape.set_deferred("disabled", &true.to_variant());
+    }
+
+    #[func]
+    fn start(&mut self, pos: Vector2) {
+        self.base_mut().set_position(pos);
+
+        self.base_mut().show();
+
+        let mut collision_shape = self
+            .base()
+            .get_node_as::<CollisionShape2D>("CollisionShape2D");
+        collision_shape.set_disabled(false);
+    }
 }
 
 #[godot_api]
@@ -24,6 +54,8 @@ impl IArea2D for Player {
     }
 
     fn ready(&mut self) {
+        // self.base_mut().hide();
+
         let viewport_rect = self.base().get_viewport_rect();
 
         self.screen_size = Vector2::new(viewport_rect.size.x, viewport_rect.size.y);
@@ -31,6 +63,10 @@ impl IArea2D for Player {
         let animated_sprite = self.base().get_node_as("AnimatedSprite2D");
 
         self.animated_sprite.init(animated_sprite);
+
+        self.signals()
+            .body_entered()
+            .connect_self(Self::on_body_entered);
     }
 
     fn physics_process(&mut self, delta: f32) {
