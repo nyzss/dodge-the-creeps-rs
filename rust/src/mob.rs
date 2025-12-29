@@ -34,7 +34,7 @@ impl IRigidBody2D for Mob {
             .unwrap()
             .get_animation_names();
 
-        let animation_names: Array<GString> = mob_types.as_slice().iter().cloned().collect();
+        let animation_names: Array<GString> = mob_types.as_slice().into();
         let rand_animation = animation_names.pick_random().unwrap();
 
         animated_sprites.set_animation(rand_animation.arg());
