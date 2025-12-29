@@ -83,21 +83,14 @@ impl INode for Main {
             score: 0,
             mob_scene: OnEditor::default(),
 
-            mob_timer: OnReady::manual(),
-            score_timer: OnReady::manual(),
-            start_timer: OnReady::manual(),
+            mob_timer: OnReady::from_node("MobTimer"),
+            score_timer: OnReady::from_node("ScoreTimer"),
+            start_timer: OnReady::from_node("StartTimer"),
         }
     }
 
     fn ready(&mut self) {
         let main = self.to_gd();
-
-        self.mob_timer
-            .init(self.base().get_node_as::<Timer>("MobTimer"));
-        self.score_timer
-            .init(self.base().get_node_as::<Timer>("ScoreTimer"));
-        self.start_timer
-            .init(self.base().get_node_as::<Timer>("StartTimer"));
 
         self.mob_timer
             .signals()
