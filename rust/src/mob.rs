@@ -5,7 +5,7 @@ use godot::{
 
 #[derive(GodotClass)]
 #[class(base=RigidBody2D)]
-struct Mob {
+pub struct Mob {
     base: Base<RigidBody2D>,
 }
 
